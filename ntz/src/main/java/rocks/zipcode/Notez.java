@@ -1,6 +1,13 @@
 package rocks.zipcode;
 
+
+
+import java.io.IOException;
+import java.security.Security;
 import java.util.Arrays;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * ntz main command.
@@ -8,6 +15,12 @@ import java.util.Arrays;
 public final class Notez {
 
     private FileMap filemap;
+    Logger logger = Logger.getLogger("Mylogger");
+    FileHandler fh;
+
+
+
+
 
     public Notez() {
         this.filemap  = new FileMap();
@@ -18,6 +31,7 @@ public final class Notez {
      * @param args The arguments of the program.
      */
     public static void main(String argv[]) {
+
         boolean _debug = true;
         // for help in handling the command line flags and data!
         if (_debug) {
@@ -29,7 +43,7 @@ public final class Notez {
         }
 
         Notez ntzEngine = new Notez();
-
+        ntzEngine.loggerSetup();
         ntzEngine.loadDatabase();
 
 
@@ -50,10 +64,43 @@ public final class Notez {
         } else {
             if (argv[0].equals("-r")) {
                 ntzEngine.addToCategory("General", argv);
-                ntzEngine.printResults();
-            } // this should give you an idea about how to TEST the Notez engine
-              // without having to spend lots of time messing with command line arguments.
+                //logger.info(ntzEngine.printResults());
+            }
+            else if(argv[0].equals("-c")) {
+                if (ntzEngine.filemap.containsKey(argv[1])) {
+                    String[] hold = new String[argv.length - 2];
+                    int position = 0;
+                    for (int i = 2; i < argv.length; i++) {
+                        hold[position] = argv[i];
+                        position++;
+                    }
+                    ntzEngine.addToCategory(argv[1], hold);
+                    ntzEngine.printResults();
+                }
+            }
+            else if(argv[0].equals("-f")){
+                if(ntzEngine.filemap.containsKey(argv[1])){
+                    ntzEngine.filemap.remove(argv[1], Integer.parseInt(argv[2]));
+                    ntzEngine.printResults();
+                }
+                else{
+                    System.out.println("Invalid input");
+                }
+            }
+            else if(argv[0].equals("-e")){
+                if(ntzEngine.filemap.containsKey(argv[1])) {
+                    String newValue = "";
+                    for(int i = 3; i < argv.length; i++){
+                        newValue = newValue + argv[i] + " ";
+                    }
+                    ntzEngine.filemap.replace(argv[1], Integer.parseInt(argv[2]), newValue);
+
+                }
+            }
         }
+            // this should give you an idea about how to TEST the Notez engine
+              // without having to spend lots of time messing with command line arguments.
+
         /*
          * what other method calls do you need here to implement the other commands??
          */
@@ -69,6 +116,7 @@ public final class Notez {
                 sb.append(s + " ");
             }
         }
+        logger.info(sb + " Added to " + string );
         //System.out.println(sb);
         filemap.get(string).add(sb.toString());
     }
@@ -95,5 +143,18 @@ public final class Notez {
     /*
      * Put all your additional methods that implement commands like forget here...
      */
+    public void loggerSetup(){
+        try {
+            try {
+                fh = new FileHandler("MyLog.log");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            logger.addHandler(fh);
+        } catch (SecurityException e){
+            e.printStackTrace();
+        }
+        logger.setLevel(Level.INFO);
+    }
 
 }

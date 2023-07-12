@@ -11,11 +11,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.logging.Logger;
 
 public class FileMap implements Serializable, Map<String,NoteList> {
     /**
      *
      */
+
     private static final long serialVersionUID = 1L;
 
     static final String DBNAME = "/Users/taylor/LocalProjects/ntz-java/ntz.db";
@@ -79,12 +81,15 @@ public class FileMap implements Serializable, Map<String,NoteList> {
     public String printFileMap(){
         StringBuilder sb = new StringBuilder();
         Set<String> ks = this.keySet();
+
         for(String k: ks){
+            int index = 1;
             NoteList nl = this.get(k);
             sb.append("[" + k+ "]\n");
             for(String notes: nl){
-                sb.append(notes);
+                sb.append(index + ") " + notes);
                 sb.append("\n");
+                index++;
             }
         }
         return sb.toString();
@@ -126,6 +131,21 @@ public class FileMap implements Serializable, Map<String,NoteList> {
 
     public NoteList remove(Object key) {
         return hashmap.remove(key);
+    }
+    public NoteList remove(String key, Integer index) {
+        index--;
+        NoteList nl = hashmap.get(key);
+        String hold = nl.get(index);
+        nl.remove(hold);
+        return hashmap.put(key, nl);
+    }
+
+    public NoteList replace(String key, Integer index, String newValue) {
+        index--;
+        NoteList nl = hashmap.get(key);
+        String hold = nl.get(index);
+        nl.set(index, newValue);
+        return hashmap.put(key, nl);
     }
 
     public void putAll(Map m) {
