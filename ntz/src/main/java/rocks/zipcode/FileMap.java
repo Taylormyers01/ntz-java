@@ -18,7 +18,7 @@ public class FileMap implements Serializable, Map<String,NoteList> {
      */
     private static final long serialVersionUID = 1L;
 
-    static final String DBNAME = "ntz.db";
+    static final String DBNAME = "/Users/taylor/LocalProjects/ntz-java/ntz.db";
 
     private Map<String, NoteList> hashmap = new HashMap<String, NoteList>();
 
@@ -76,6 +76,20 @@ public class FileMap implements Serializable, Map<String,NoteList> {
         return s.toString();
     }
 
+    public String printFileMap(){
+        StringBuilder sb = new StringBuilder();
+        Set<String> ks = this.keySet();
+        for(String k: ks){
+            NoteList nl = this.get(k);
+            sb.append("[" + k+ "]\n");
+            for(String notes: nl){
+                sb.append(notes);
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
     public int size() {
         return hashmap.size();
     }
@@ -102,6 +116,11 @@ public class FileMap implements Serializable, Map<String,NoteList> {
     }
 
     public NoteList put(String key, NoteList value) {
+        if(hashmap.containsKey(key)){
+            this.get(key).addAll(value);
+            //nl.add(value.get(0));
+            return hashmap.put((String)key, this.get(key));
+        }
         return hashmap.put((String) key, (NoteList) value);
     }
 
@@ -129,5 +148,5 @@ public class FileMap implements Serializable, Map<String,NoteList> {
         return hashmap.entrySet();
     }
 
- 
+
 }

@@ -1,5 +1,7 @@
 package rocks.zipcode;
 
+import java.util.Arrays;
+
 /**
  * ntz main command.
  */
@@ -12,7 +14,7 @@ public final class Notez {
     }
     /**
      * Says hello to the world.
-     * 
+     *
      * @param args The arguments of the program.
      */
     public static void main(String argv[]) {
@@ -30,16 +32,17 @@ public final class Notez {
 
         ntzEngine.loadDatabase();
 
+
         /*
          * You will spend a lot of time right here.
-         * 
+         *
          * instead of loadDemoEntries, you will implement a series
          * of method calls that manipulate the Notez engine.
          * See the first one:
          */
-        ntzEngine.loadDemoEntries();
+        //ntzEngine.loadDemoEntries();
 
-        ntzEngine.saveDatabase();
+
 
         if (argv.length == 0) { // there are no commandline arguments
             //just print the contents of the filemap.
@@ -47,16 +50,27 @@ public final class Notez {
         } else {
             if (argv[0].equals("-r")) {
                 ntzEngine.addToCategory("General", argv);
+                ntzEngine.printResults();
             } // this should give you an idea about how to TEST the Notez engine
               // without having to spend lots of time messing with command line arguments.
         }
         /*
          * what other method calls do you need here to implement the other commands??
          */
+        ntzEngine.saveDatabase();
 
     }
 
     private void addToCategory(String string, String[] argv) {
+        StringBuilder sb = new StringBuilder();
+
+        for(String s: argv){
+            if(!s.equalsIgnoreCase("-r")){
+                sb.append(s + " ");
+            }
+        }
+        //System.out.println(sb);
+        filemap.get(string).add(sb.toString());
     }
 
     private void saveDatabase() {
@@ -68,11 +82,12 @@ public final class Notez {
     }
 
     public void printResults() {
-        System.out.println(this.filemap.toString());
+        System.out.println(this.filemap.printFileMap());
     }
 
     public void loadDemoEntries() {
         filemap.put("General", new NoteList("The Very first Note"));
+        filemap.put("General", new NoteList("The Very second Note"));
         filemap.put("note2", new NoteList("A secret second note"));
         filemap.put("category3", new NoteList("Did you buy bread AND eggs?"));
         filemap.put("anotherNote", new NoteList("Hello from ZipCode!"));
